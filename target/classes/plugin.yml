@@ -1,0 +1,11 @@
+name: CustomItemsAPI
+version: 1.0
+author: KxmischesDomi
+api-version: 1.13
+main: net.kxmischesdomi.customitems.CustomItems
+
+commands:
+  customitems:
+    aliases:
+      - items
+    permission: "customitems.items"
