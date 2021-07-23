@@ -1,14 +1,15 @@
 package net.kxmischesdomi.customitems;
 
-import net.kxmischesdomi.customitems.api.management.CustomItemsManagement;
-import net.kxmischesdomi.customitems.spigot.commands.CustomItemsCommand;
-import net.kxmischesdomi.customitems.spigot.listener.CraftingListener;
-import net.kxmischesdomi.customitems.spigot.listener.CustomEventsListener;
-import net.kxmischesdomi.customitems.spigot.listener.MenuListener;
-import net.kxmischesdomi.customitems.test.Test;
-import net.kxmischesdomi.customitems.utils.plugin.BukkitModule;
-import net.kxmischesdomi.customitems.utils.recipe.CustomItemRecipe;
-import net.kxmischesdomi.customitems.utils.recipe.RecipeBuilder;
+import net.kxmischesdomi.customitems.bukkit.commands.CustomItemsCommand;
+import net.kxmischesdomi.customitems.bukkit.listener.CraftingListener;
+import net.kxmischesdomi.customitems.bukkit.listener.CustomEventsListener;
+import net.kxmischesdomi.customitems.bukkit.listener.MenuListener;
+import net.kxmischesdomi.customitems.management.customitems.CustomItemsManagement;
+import net.kxmischesdomi.customitems.management.scheduler.ScheduleManager;
+import net.kxmischesdomi.customitems.test.CustomItemsLoader;
+import net.kxmischesdomi.customitems.utils.bukkit.plugin.BukkitModule;
+import net.kxmischesdomi.customitems.utils.bukkit.recipe.CustomItemRecipe;
+import net.kxmischesdomi.customitems.utils.bukkit.recipe.RecipeBuilder;
 
 /**
  * @author KxmischesDomi | https://github.com/kxmischesdomi
@@ -19,8 +20,13 @@ public class CustomItems extends BukkitModule {
 	private static CustomItems instance;
 
 	private CustomItemsManagement customItemsManagement;
+	private ScheduleManager scheduleManager;
 
 	private boolean inventoriesGenerated;
+
+	public static CustomItems getInstance() {
+		return instance;
+	}
 
 	@Override
 	public void onLoad() {
@@ -29,9 +35,10 @@ public class CustomItems extends BukkitModule {
 		RecipeBuilder.setDefaultPlugin(this);
 		CustomItemRecipe.setDefaultPlugin(this);
 
-		customItemsManagement = new CustomItemsManagement(this);
+		scheduleManager = new ScheduleManager();
+		customItemsManagement = new CustomItemsManagement();
 
-		Test.test();
+		CustomItemsLoader.load();
 	}
 
 	@Override
@@ -43,12 +50,16 @@ public class CustomItems extends BukkitModule {
 
 		inventoriesGenerated = true;
 		customItemsManagement.generateTabInventories();
+
+		scheduleManager.start();
 	}
 
 	public void registerPluginCommands() {
 		try {
 			getCommand("customitems").setExecutor(new CustomItemsCommand());
-		} catch (Exception ex) { ex.printStackTrace(); }
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public void registerPluginListener() {
@@ -63,12 +74,12 @@ public class CustomItems extends BukkitModule {
 		return customItemsManagement;
 	}
 
-	public boolean inventoriesGenerated() {
-		return inventoriesGenerated;
+	public ScheduleManager getScheduleManager() {
+		return scheduleManager;
 	}
 
-	public static CustomItems getInstance() {
-		return instance;
+	public boolean inventoriesGenerated() {
+		return inventoriesGenerated;
 	}
 
 }
